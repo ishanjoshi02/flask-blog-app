@@ -1,10 +1,14 @@
 from sqlalchemy import Column, String, Integer, TIMESTAMP, ForeignKey
-from sqlalchemy.ext.declarative import  declarative_base
+from sqlalchemy.ext.declarative import declarative_base
+
+import datetime
 
 Base = declarative_base()
 
 
 class Post(Base):
+
+    session = None
 
     __tablename__ = "posts"
 
@@ -20,6 +24,7 @@ class Post(Base):
         self.title = title
         self.content = content
         self.author = author
+        self.created_on = datetime.datetime.now()
 
     def __iter__(self):
         yield "id", self.id
@@ -29,3 +34,39 @@ class Post(Base):
 
     def __repr__(self):
         return "<BlogModel title: {} AuthorId: {} >".format(self.name, self.author)
+
+    @classmethod
+    def init_session(cls, session):
+        cls.session = session
+
+    # todo create session exists decorator
+
+    def create(self):
+        Post.session.add(self)
+
+    @classmethod
+    def get(cls, id):
+        if not cls.session:
+            raise Exception("Session for UserClass not set."
+                            "\nSet Class session using init_session static method of the class")
+            # Todo check if user exists based on id. If not, raise exception
+        if id:
+            return cls.session.query(cls).get(id).filter(Post.deleted_on == None)
+
+        return cls.get_all()
+
+    @classmethod
+    def get_all(cls):
+        cls.session.query(cls).filter(cls.deleted_on==None).all()
+
+    def update(self, title, content):
+        Post.session.query(Post).get(self.id).update({
+            "title": title,
+            "content": content,
+            "updated_on": datetime.datetime.now()
+        })
+
+    def delete(self, id):
+        Post.session.query(Post).get(id).update({
+            "deleted_on":datetime.datetime.now()
+        })
