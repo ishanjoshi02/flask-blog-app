@@ -1,11 +1,18 @@
 from sqlalchemy import Column, String, Integer, TIMESTAMP, ForeignKey
-from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.ext.declarative import declarative_base
+
+from werkzeug.security import check_password_hash, generate_password_hash
+
+from blog.posts.data.models import Post
 
 import datetime
 
-db = SQLAlchemy()
+Base = declarative_base()
 
-class User(db.Model):
+
+class User(Base):
+
+    session = None
 
     __tablename__ = "users"
 
@@ -19,8 +26,54 @@ class User(db.Model):
 
         self.name = f"{firstname} {lastname}"
         self.username = username
-        self.password = password
+        self.password = generate_password_hash(password)
 
     def __repr__(self):
 
         return f"<User name: {self.name} username: {self.username}>"
+
+    def get_id(self):
+        return str(self.id).encode("utf-8").decode("utf-8")
+
+    @classmethod
+    def init_session(cls, session):
+        cls.session = session
+
+    # todo create check session decorator
+
+    @classmethod
+    def get(cls, id):
+        if not cls.session:
+            raise Exception("Session for UserClass not set."
+                            "\nSet Class session using init_session static method of the class")
+        # Todo check if user exists based on id. If not, raise exception
+        return cls.session.query(cls).get(id)
+
+    @classmethod
+    def check_if_username_exists(cls, username):
+        return cls.session.query(cls).filter(cls.username == username).count != 0
+
+    @classmethod
+    def get_session(cls):
+
+        return cls.session
+
+    def register_user(self):
+        User.get_session().add(self)
+        User.get_session().commit()
+
+    def create(self):
+        self.register_user()
+
+    def get_blogs(self):
+        blogs = Post.session.query(Post).filter(Post.author_id == self.id).filter(Post.deleted_on is None).all()
+        return blogs
+
+    @classmethod
+    def auth(cls, username, password):
+        # todo check if username exists
+        query = cls.session.query(cls).filter(cls.username == username)
+        for row in query:
+            if check_password_hash(password, row.password):
+                return True
+        return False
