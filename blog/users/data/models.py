@@ -63,11 +63,15 @@ class User(Base):
         return cls.session
 
     def register_user(self):
+        id= User.session.query(User).order_by(User.id.desc()).first().id + 1
         User.get_session().add(self)
         User.get_session().commit()
+        if id == None:
+            return 1
+        return id
 
     def create(self):
-        self.register_user()
+        return self.register_user()
 
     def get_blogs(self):
         return Post.session.query(Post).filter(Post.author == self.id).filter(Post.deleted_on == None).all()

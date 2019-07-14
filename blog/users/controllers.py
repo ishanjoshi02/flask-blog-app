@@ -43,9 +43,9 @@ def register():
         password = form.password.data
 
         new_user = User(firstname, lastname, username, password)
-        new_user.create()
-
-        login_user(new_user, remember=True)
+        id = new_user.create()
+        print(f"Id: {id}")
+        login_user(User.get(id), remember=True)
 
         return redirect("/")
 
