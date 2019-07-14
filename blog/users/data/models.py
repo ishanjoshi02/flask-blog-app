@@ -63,7 +63,10 @@ class User(Base):
         return cls.session
 
     def register_user(self):
-        id= User.session.query(User).order_by(User.id.desc()).first().id + 1
+        try:
+            id = User.session.query(User).order_by(User.id.desc()).first().id + 1
+        except:
+            id = 1
         User.get_session().add(self)
         User.get_session().commit()
         if id == None:

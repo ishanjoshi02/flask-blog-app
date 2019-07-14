@@ -42,7 +42,10 @@ class Post(Base):
     # todo create session exists decorator
 
     def create(self):
-        id= Post.session.query(Post).order_by(Post.id.desc()).first().id + 1
+        try:
+            id= Post.session.query(Post).order_by(Post.id.desc()).first().id + 1
+        except:
+            id = 1
         Post.session.add(self)
         Post.session.commit()
         return id
