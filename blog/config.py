@@ -21,8 +21,8 @@ class BaseConfig(object):
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
     TESTING = True
-    database_metadata.host = "localhost"
-    database_metadata.password = "toor"
+    database_metadata['host'] = "localhost"
+    database_metadata['password'] = "toor"
 
 class TestingConfig(BaseConfig):
     DEBUG = False

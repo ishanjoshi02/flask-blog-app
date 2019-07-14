@@ -1,0 +1,35 @@
+{% extends 'layout.html' %}
+{% block titleBlock %}
+    Home
+{% endblock %}
+{% block bodyBlock %}
+<h2>
+  <center>
+      Welcome {{ name }}
+  </center>
+</h2>
+<h4>
+    Your Blogs
+</h4>
+{% if blogs %}
+    {% for blog in blogs %}
+        <a href="/post/{{ blog.id }}">
+            {{ blog.title }}
+        </a>
+        <br />
+    {% endfor %}
+{% endif %}
+<hr />
+{%with messages= get_flashed_messages()%}
+    {% if messages %}
+        {%for message in messages %}
+            {{ message }}
+        {%endfor %}
+    {%endif%}
+{%endwith%}
+<center>
+    <a class="btn btn-primary" href="/post/new">
+        New Blog
+    </a>
+</center>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}
+{% from 'form_macro.html' import render_fields %}
+{% block titleBlock %}
+    New Blog
+{% endblock %}
+{% block bodyBlock %}
+<h1>New Blog</h1>
+<form method="POST" action="/post/new">
+  <div class="form-group col-sm-2">
+    {{ render_fields(form) }}
+    {{ form.csrf_token }}
+    <button class="btn btn-primary" role="submit">Post</button>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'layout.html' %}{% from 'form_macro.html' import render_fields %} {%
+block titleBlock %}Register User{% endblock %} {% block bodyBlock %}
+
+<div class="card bg-light mb-3">
+  <div class="card-header">Register User</div>
+  <div class="card-body">
+    <form method="POST" action="/user/register">
+      <div class="form-group col-sm-2">
+        {{ render_fields(form) }}
+        <button class="btn btn-primary" role="submit">Register</button>
+      </div>
+      {{ form.csrf_token }}
+    </form>
+    {% for field in form.errors %} {% for error in form.errors[field] %}
+    <div class="alert alert-error"><strong>Error!</strong> {{ error }}</div>
+    {% endfor %} {% endfor %}
+  </div>
+  <div class="card-footer">
+    Already have an Account?
+    <br />
+    <a class="btn btn-primary" href="/login">
+      Login
+    </a>
+  </div>
+</div>
+
+{% endblock %}

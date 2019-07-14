@@ -7,3 +7,5 @@ alembic
 flask_wtf
 flask_restful
 flask_sqlalchemy
+werkzeug
+cryptography

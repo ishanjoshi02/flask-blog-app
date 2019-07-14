@@ -22,6 +22,10 @@ class User(Base):
     password = Column("password", String, nullable=False)
     created_on = Column(TIMESTAMP, default=datetime.datetime.now())
 
+    is_authenticated = True
+    is_active = True
+    is_anonymous = False
+
     def __init__(self, firstname, lastname, username, password):
 
         self.name = f"{firstname} {lastname}"
@@ -66,14 +70,14 @@ class User(Base):
         self.register_user()
 
     def get_blogs(self):
-        blogs = Post.session.query(Post).filter(Post.author_id == self.id).filter(Post.deleted_on is None).all()
-        return blogs
+        return Post.session.query(Post).filter(Post.author == self.id).filter(Post.deleted_on == None).all()
+
 
     @classmethod
     def auth(cls, username, password):
         # todo check if username exists
         query = cls.session.query(cls).filter(cls.username == username)
         for row in query:
-            if check_password_hash(password, row.password):
-                return True
+            if check_password_hash(row.password, password):
+                return [True, row]
         return False

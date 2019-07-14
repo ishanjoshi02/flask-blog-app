@@ -12,10 +12,10 @@ class Post(Base):
 
     __tablename__ = "posts"
 
-    id = Column("id", Integer, primary_key=True, autoincrement=True, default=0)
+    id = Column("id", Integer, primary_key=True, autoincrement=True, nullable=True, default=0)
     title = Column("title", String, default="")
     content = Column("content", String, default="")
-    author_id = Column("author", Integer, ForeignKey("user.id"))
+    author = Column("author", Integer)
     created_on = Column(TIMESTAMP)
     deleted_on = Column(TIMESTAMP)
     edited_on = Column(TIMESTAMP)
@@ -33,7 +33,7 @@ class Post(Base):
         yield "author", self.author
 
     def __repr__(self):
-        return "<BlogModel title: {} AuthorId: {} >".format(self.name, self.author)
+        return "<BlogModel title: {} AuthorId: {} >".format(self.title, self.author)
 
     @classmethod
     def init_session(cls, session):
@@ -42,7 +42,11 @@ class Post(Base):
     # todo create session exists decorator
 
     def create(self):
+        id= Post.session.query(Post).order_by(Post.id.desc()).first().id + 1
         Post.session.add(self)
+        Post.session.commit()
+        return id
+
 
     @classmethod
     def get(cls, id):
@@ -51,22 +55,26 @@ class Post(Base):
                             "\nSet Class session using init_session static method of the class")
             # Todo check if user exists based on id. If not, raise exception
         if id:
-            return cls.session.query(cls).get(id).filter(Post.deleted_on == None)
+            return cls.session.query(cls).get(id)
 
         return cls.get_all()
 
     @classmethod
     def get_all(cls):
-        cls.session.query(cls).filter(cls.deleted_on==None).all()
+        return cls.session.query(cls).filter(cls.deleted_on == None).all()
 
     def update(self, title, content):
-        Post.session.query(Post).get(self.id).update({
+        # todo check if blog exists
+        Post.session.query(Post).filter(self.id == Post.id).update({
             "title": title,
             "content": content,
-            "updated_on": datetime.datetime.now()
+            "edited_on": datetime.datetime.now()
         })
+        Post.session.commit()
 
-    def delete(self, id):
-        Post.session.query(Post).get(id).update({
-            "deleted_on":datetime.datetime.now()
+    def delete(self):
+        # todo check if blog exists.
+        Post.session.query(Post).filter(Post.id == self.id).update({
+            "deleted_on": datetime.datetime.now()
         })
+        Post.session.commit()
