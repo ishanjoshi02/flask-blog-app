@@ -51,7 +51,7 @@ class User(Base):
             raise Exception("Session for UserClass not set."
                             "\nSet Class session using init_session static method of the class")
         # Todo check if user exists based on id. If not, raise exception
-        return cls.session.query(cls).get(id)
+        return cls.session.query(cls).get(int(id))
 
     @classmethod
     def check_if_username_exists(cls, username):
