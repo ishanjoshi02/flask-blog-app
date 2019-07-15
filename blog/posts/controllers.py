@@ -80,6 +80,6 @@ def get_posts(start, end):
     for i in range(start, end, 1):
         blog = posts[i]
         temp = dict(blog)
-        temp['author'] = User.get(temp['author']).name
+        temp['author'] = User.get(int(temp['author'])).name
         ret_val.append(temp)
     return json.dumps(ret_val)
