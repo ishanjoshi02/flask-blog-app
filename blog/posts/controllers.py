@@ -62,11 +62,18 @@ def blog(id):
 def get_post(id):
     post = Post.get(id)
     author = User.get(post.author)
+    editable = False
+    try:
+        if current_user.id:
+            if current_user.id == author.id:
+                editable = True
+    except AttributeError:
+        pass
     return render_template("view_blog.html",
                            title=post.title,
                            content=post.content,
                            blog_id=post.id,
-                           editable=(current_user.id is post.author),
+                           editable=editable,
                            author=author.name,author_id=author.id,
                            )
 
@@ -80,6 +87,5 @@ def get_posts(start, end):
     for i in range(start, end, 1):
         blog = posts[i]
         temp = dict(blog)
-        temp['author'] = User.get(int(temp['author'])).name
         ret_val.append(temp)
     return json.dumps(ret_val)

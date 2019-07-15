@@ -58,6 +58,8 @@ class Post(Base):
                             "\nSet Class session using init_session static method of the class")
             # Todo check if user exists based on id. If not, raise exception
         if id:
+            if type(id) == String:
+                id = int(id)
             return cls.session.query(cls).get(id)
 
         return cls.get_all()
