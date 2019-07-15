@@ -46,6 +46,6 @@ login_manager.login_view = '/login'
 @login_manager.user_loader
 def load_user(id):
     if id:
-        return session.query(User).get(id)
+        return session.query(User).get(int(id))
     else:
         return None
